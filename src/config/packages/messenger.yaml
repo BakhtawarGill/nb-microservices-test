@@ -1,0 +1,11 @@
+framework:
+    messenger:
+        transports:
+            kafka:
+                dsn: '%env(KAFKA_DSN)%'
+                serializer: messenger.transport.symfony_serializer
+                options:
+                    queue: '%env(KAFKA_QUEUE)%'
+
+        routing:
+            'App\Message\UserCreatedMessage': kafka

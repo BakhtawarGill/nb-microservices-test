@@ -1,0 +1,6 @@
+framework:
+  validation:
+    enabled: true
+    constraints:
+      - Symfony\Component\Validator\Constraints\NotBlank
+      - Symfony\Component\Validator\Constraints\Email

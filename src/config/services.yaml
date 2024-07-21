@@ -1,0 +1,40 @@
+services:
+    # Default configurations for services
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # Explicitly configured services
+    App\Controller\UserController:
+        public: true
+        tags:
+            - { name: controller.service_arguments }
+
+    App\Serializer\Normalizer\UserResourceNormalizer:
+        tags: [ 'serializer.normalizer' ]
+
+    App\Handler\CreateUserHandler:
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $validator: '@validator'
+
+    # Include all services in the App namespace
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
+
+    # Tag the message handler
+    App\MessageHandler\UserCreatedMessageHandler:
+        tags: ['messenger.message_handler']
+
+    # Add the new service
+    app.listener.user_created:
+        class: App\EventListener\UserCreatedListener
+        arguments: [ '@message_bus' ]
+        tags:
+        - { name: kernel.event_listener, event: app.event.user_created, method: onUserCreated }
+
+
+    App\Notification\NotificationService:
+        tags:
+        - { name: messenger.message_handler, method: handleNotifyUserCreatedMessage }
